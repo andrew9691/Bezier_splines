@@ -129,11 +129,6 @@ namespace Bezier_splines
                         g.FillEllipse(new SolidBrush(Color.Black), origin_pts[k].X - 5, origin_pts[k].Y - 5, 10, 10);
             }
 
-            public void clear()
-            {
-                lp.Clear();
-            }
-
         }
 
         public Form1()
@@ -167,7 +162,6 @@ namespace Bezier_splines
         private void button1_Click(object sender, EventArgs e)
         {
             g.Clear(Color.White);
-            bs.clear();
             original_pts.Clear();
             listBox1.Items.Clear();
             pictureBox1.Invalidate();
