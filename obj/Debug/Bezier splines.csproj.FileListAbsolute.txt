@@ -16,3 +16,12 @@ D:\_Desktop\Bezier splines\obj\Debug\Bezier_splines.Properties.Resources.resourc
 D:\_Desktop\Bezier splines\obj\Debug\Bezier splines.csproj.GenerateResource.Cache
 D:\_Desktop\Bezier splines\obj\Debug\Bezier splines.exe
 D:\_Desktop\Bezier splines\obj\Debug\Bezier splines.pdb
+D:\DZ\Bezier_splines\bin\Debug\Bezier splines.exe.config
+D:\DZ\Bezier_splines\obj\Debug\Bezier splines.exe
+D:\DZ\Bezier_splines\obj\Debug\Bezier splines.pdb
+D:\DZ\Bezier_splines\bin\Debug\Bezier splines.exe
+D:\DZ\Bezier_splines\bin\Debug\Bezier splines.pdb
+D:\DZ\Bezier_splines\obj\Debug\Bezier_splines.Form1.resources
+D:\DZ\Bezier_splines\obj\Debug\Bezier_splines.Properties.Resources.resources
+D:\DZ\Bezier_splines\obj\Debug\Bezier splines.csproj.GenerateResource.Cache
+D:\DZ\Bezier_splines\obj\Debug\Bezier splines.csprojResolveAssemblyReference.cache

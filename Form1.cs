@@ -16,6 +16,7 @@ namespace Bezier_splines
         Graphics g;
         Bitmap mainBitmap;
         bezier_splines bs;
+        List<Point> original_pts = new List<Point>();
 
         class bezier_splines
         {
@@ -26,10 +27,9 @@ namespace Bezier_splines
 
             private List<Point> lp;
 
-            public bezier_splines(Graphics g, PictureBox pb, List<Point> lp)
+            public bezier_splines(Graphics g, PictureBox pb)
             {
-                this.lp = lp;
-
+                lp = new List<Point>();
                 segs_pen = new Pen(Color.Blue);
                 splines_pen = new Pen(Color.Red);
                 this.g = g;
@@ -41,53 +41,24 @@ namespace Bezier_splines
                 lp.Add(p);
             }
 
-            //private void twopts_spline()
-            //{
-            //    g.DrawLine(splines_pen, lp[0], lp[1]);
-            //}
-
-            //private void threepts_spline()
-            //{
-            //    g.DrawLine(segs_pen, lp[0], lp[1]);
-            //    g.DrawLine(segs_pen, lp[1], lp[2]);
-
-            //    Point last_spline_p = lp[0];
-            //    for (double t = 0; t <= 1; t += 0.005)
-            //    {
-            //        double Q1x = lp[0].X * (1 - t) + lp[1].X * t;
-            //        double Q1y = lp[0].Y * (1 - t) + lp[1].Y * t;
-            //        double Q2x = lp[1].X * (1 - t) + lp[2].X * t;
-            //        double Q2y = lp[1].Y * (1 - t) + lp[2].Y * t;
-            //        double res_x = Q1x * (1 - t) + Q2x * t;
-            //        double res_y = Q1y * (1 - t) + Q2y * t;
-
-            //        // соединяем последнюю точку сплайна и новую
-            //        g.DrawLine(splines_pen, last_spline_p, new Point((int)res_x, (int)res_y));
-            //        last_spline_p.X = (int)res_x;
-            //        last_spline_p.Y = (int)res_y;
-            //    }
-            //}
+            public int cnt_points()
+            {
+                return lp.Count;
+            }
 
             private void fourpts_spline(Point p0, Point p1, Point p2, Point p3)
             {
-                //g.DrawLine(segs_pen, lp[0], lp[1]);
-                //g.DrawLine(segs_pen, lp[1], lp[2]);
-                //g.DrawLine(segs_pen, lp[2], lp[3]);
-
                 g.DrawLine(segs_pen, p0, p1);
                 g.DrawLine(segs_pen, p1, p2);
                 g.DrawLine(segs_pen, p2, p3);
 
-                //Point last_spline_p = lp[0];
                 Point last_spline_p = p0;
                 for (double t = 0; t <= 1; t += 0.005)
                 {
                     double p = 1 - t;
-                    //double res_x = lp[0].X * Math.Pow(p, 3) + 3 * lp[1].X * p * p * t + 3 * lp[2].X * p * t * t + lp[3].X * t * t * t;
-                    //double res_y = lp[0].Y * Math.Pow(p, 3) + 3 * lp[1].Y * p * p * t + 3 * lp[2].Y * p * t * t + lp[3].Y * t * t * t;
 
-                    double res_x = p0.X * Math.Pow(p, 3) + 3 * p1.X * p * p * t + 3 * p2.X * p * t * t + p3.X * t * t * t;
-                    double res_y = p0.Y * Math.Pow(p, 3) + 3 * p1.Y * p * p * t + 3 * p2.Y * p * t * t + p3.Y * t * t * t;
+                    double res_x = p0.X * p * p * p + 3 * p1.X * p * p * t + 3 * p2.X * p * t * t + p3.X * t * t * t;
+                    double res_y = p0.Y * p * p * p + 3 * p1.Y * p * p * t + 3 * p2.Y * p * t * t + p3.Y * t * t * t;
 
                     // соединяем последнюю точку сплайна и новую
                     g.DrawLine(splines_pen, last_spline_p, new Point((int)res_x, (int)res_y));
@@ -98,45 +69,69 @@ namespace Bezier_splines
 
             private Point segment_center(Point p1, Point p2)
             {
-                double x = (p1.X + p2.X) / 2;
-                double y = (p2.X * p1.Y - p1.X * p2.Y - x * (p1.Y - p2.Y)) / (p2.X - p1.X);
+                double x, y;
+                if (p1.X != p2.X)
+                {
+                    x = (p1.X + p2.X) / 2;
+                    y = (p2.X * p1.Y - p1.X * p2.Y - x * (p1.Y - p2.Y)) / (p2.X - p1.X);
+                }
+                else
+                {
+                    x = p1.X;
+                    y = (p1.Y + p2.Y) / 2;
+                }
                 return new Point((int)x, (int)y);
             }
 
-            public void build()
+            public void build(List<Point> origin_pts, int listBox_ind)
             {
-				if (lp.Count < 4)
+                lp.Clear();
+                for (int i = 0; i < origin_pts.Count; i++)
+                    lp.Add(origin_pts[i]);
+
+                if (lp.Count < 4)
 					return;
-				else if (lp.Count == 5)// || lp.Count == 6) // (lp.Count - 4) % 3 == 0 — исключения
+				else if (lp.Count == 5) // (lp.Count - 4) % 3 == 0 — исключения
 				{
 					lp.Insert(3, segment_center(lp[2], lp[3]));
 					lp.Insert(5, segment_center(lp[4], lp[5]));
 					fourpts_spline(lp[0], lp[1], lp[2], lp[3]);
 					fourpts_spline(lp[3], lp[4], lp[5], lp[6]);
-					return;
+                    for (int i = 0; i < origin_pts.Count; i++)
+                        g.FillEllipse(new SolidBrush(Color.Black), origin_pts[i].X - 5, origin_pts[i].Y - 5, 10, 10);
+                    return;
 				}
-				else if (lp.Count == 6)
-				{
+				else if (lp.Count == 6) // (lp.Count - 4) % 3 == 0 — исключения
+                {
 					lp.Insert(3, segment_center(lp[2], lp[3]));
 					fourpts_spline(lp[0], lp[1], lp[2], lp[3]);
 					fourpts_spline(lp[3], lp[4], lp[5], lp[6]);
-					return;
+                    for (int i = 0; i < origin_pts.Count; i++)
+                        g.FillEllipse(new SolidBrush(Color.Black), origin_pts[i].X - 5, origin_pts[i].Y - 5, 10, 10);
+                    return;
 				}
 				else if ((lp.Count - 4) % 3 == 1)
 				{
-					lp.Insert(3, segment_center(lp[2], lp[3]));
-					lp.Insert(6, segment_center(lp[5], lp[6]));
-				}
-				else if ((lp.Count - 4) % 3 == 2)
-				{
-					lp.Insert(3, segment_center(lp[2], lp[3]));					
-				}
+                    lp.Insert(lp.Count - 4, segment_center(lp[lp.Count - 4], lp[lp.Count - 5]));
+                    lp.Insert(lp.Count - 1, segment_center(lp[lp.Count - 1], lp[lp.Count - 2]));
+                }
+                else if ((lp.Count - 4) % 3 == 2)
+                    lp.Insert(lp.Count - 1, segment_center(lp[lp.Count - 1], lp[lp.Count - 2]));
 
-				// (lp.Count - 4) % 3 == 0
-				for (int i = 0; i < lp.Count - 1; i += 3)
-				{
+                // (lp.Count - 4) % 3 == 0
+                for (int i = 0; i < lp.Count - 1; i += 3)
 					fourpts_spline(lp[i], lp[i + 1], lp[i + 2], lp[i + 3]);
-				}
+
+                for (int k = 0; k < origin_pts.Count; k++)
+                    if (listBox_ind == k)
+                        g.FillEllipse(new SolidBrush(Color.YellowGreen), origin_pts[k].X - 5, origin_pts[k].Y - 5, 10, 10);
+                    else
+                        g.FillEllipse(new SolidBrush(Color.Black), origin_pts[k].X - 5, origin_pts[k].Y - 5, 10, 10);
+            }
+
+            public void clear()
+            {
+                lp.Clear();
             }
 
         }
@@ -150,24 +145,85 @@ namespace Bezier_splines
             g.Clear(Color.White);
             pictureBox1.Image = mainBitmap;
 
-            bs = new bezier_splines(g, pictureBox1, new List<Point>());
+            bs = new bezier_splines(g, pictureBox1);
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             bs.add_point(e.Location);
+            original_pts.Add(e.Location);
+            listBox1.Items.Add("Точка " + original_pts.Count.ToString());
+            if (bs.cnt_points() > 3)
+            {
+                g.Clear(Color.White);
+                bs.build(original_pts, listBox1.SelectedIndex);
 
-			g.FillEllipse(new SolidBrush(Color.Crimson), e.X - 5, e.Y - 5, 10, 10);
-			g.Clear(Color.White);
-
-            pictureBox1.Invalidate();
-
+                pictureBox1.Invalidate();
+            }
+            listBox1.SelectedIndex = -1;
+            groupBox1.Visible = false;
         }
 
         private void button1_Click(object sender, EventArgs e)
-        {			
-            bs.build();
+        {
+            g.Clear(Color.White);
+            bs.clear();
+            original_pts.Clear();
+            listBox1.Items.Clear();
             pictureBox1.Invalidate();
+            groupBox1.Visible = false;
+        }
+
+        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int i = listBox1.SelectedIndex;
+            for (int k = 0; k < original_pts.Count; k++)
+                if (i == k)
+                    g.FillEllipse(new SolidBrush(Color.YellowGreen), original_pts[k].X - 5, original_pts[k].Y - 5, 10, 10);
+                else
+                    g.FillEllipse(new SolidBrush(Color.Black), original_pts[k].X - 5, original_pts[k].Y - 5, 10, 10);
+
+            pictureBox1.Invalidate();
+
+            if (i != -1)
+                groupBox1.Visible = true;
+
+            textBox1.Clear();
+            textBox2.Clear();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            if (listBox1.SelectedIndex == -1)
+                return;
+
+            Point p = original_pts[listBox1.SelectedIndex];
+            original_pts.Remove(p);
+            listBox1.Items.Clear();
+            for (int i = 1; i <= original_pts.Count; i++)
+                listBox1.Items.Add("Точка " + i.ToString());
+
+            g.Clear(Color.White);
+            bs.build(original_pts, listBox1.SelectedIndex);
+            pictureBox1.Invalidate();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            int x, y;
+            if (int.TryParse(textBox1.Text, out x) && int.TryParse(textBox2.Text, out y))
+            {
+                int i = listBox1.SelectedIndex;
+                Point p = original_pts[i];
+                p.X += x;
+                p.Y += y;
+                original_pts[i] = p;
+
+                g.Clear(Color.White);
+                bs.build(original_pts, listBox1.SelectedIndex);
+
+                pictureBox1.Invalidate();
+            }
         }
     }
 }
