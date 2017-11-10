@@ -12,7 +12,6 @@ namespace Bezier_splines
 {
     public partial class Form1 : Form
     {
-
         Graphics g;
         Bitmap mainBitmap;
         bezier_splines bs;
@@ -93,8 +92,8 @@ namespace Bezier_splines
 					return;
 				else if (lp.Count == 5) // (lp.Count - 4) % 3 == 0 — исключения
 				{
-					lp.Insert(3, segment_center(lp[2], lp[3]));
-					lp.Insert(5, segment_center(lp[4], lp[5]));
+					lp.Insert(4, segment_center(lp[3], lp[4]));
+					lp.Insert(4, lp[4]);
 					fourpts_spline(lp[0], lp[1], lp[2], lp[3]);
 					fourpts_spline(lp[3], lp[4], lp[5], lp[6]);
                     for (int i = 0; i < origin_pts.Count; i++)
@@ -103,7 +102,7 @@ namespace Bezier_splines
 				}
 				else if (lp.Count == 6) // (lp.Count - 4) % 3 == 0 — исключения
                 {
-					lp.Insert(3, segment_center(lp[2], lp[3]));
+					lp.Insert(5, segment_center(lp[4], lp[5])); 
 					fourpts_spline(lp[0], lp[1], lp[2], lp[3]);
 					fourpts_spline(lp[3], lp[4], lp[5], lp[6]);
                     for (int i = 0; i < origin_pts.Count; i++)
@@ -112,9 +111,9 @@ namespace Bezier_splines
 				}
 				else if ((lp.Count - 4) % 3 == 1)
 				{
-                    lp.Insert(lp.Count - 4, segment_center(lp[lp.Count - 4], lp[lp.Count - 5]));
-                    lp.Insert(lp.Count - 1, segment_center(lp[lp.Count - 1], lp[lp.Count - 2]));
-                }
+					lp.Insert(lp.Count - 1, segment_center(lp[lp.Count - 1], lp[lp.Count - 2]));
+					lp.Insert(lp.Count - 1, lp[lp.Count - 2]);
+				}
                 else if ((lp.Count - 4) % 3 == 2)
                     lp.Insert(lp.Count - 1, segment_center(lp[lp.Count - 1], lp[lp.Count - 2]));
 
